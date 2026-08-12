@@ -1,6 +1,6 @@
 总分：100分
 
-检查项：交付文件与修复库可读性
+1. 交付文件与修复库可读性
 分值：12分
 标准答案或判定规则：题面声明的数据库、完成版SQL和业务报表均位于指定路径；数据库可由SQLite打开，报表可按report_contract.json解析。
 关键字段或路径：output/api_billing_repaired.db；output/rebuild_api_billing.sql；output/reports目录；report_contract.json中的file、table、columns和order_by。
@@ -12,7 +12,7 @@
 优先级：Gate项
 所属层级：L7产物结构或Schema或专业对象层
 
-检查项：源表保护与账期合同
+2. 源表保护与账期合同
 分值：12分
 标准答案或判定规则：输入库的业务源表在修复库中保持逐行一致；billing_meta的账期取自billing_contract.json；运行时临时合同对象不进入交付库。
 关键字段或路径：tenant_account；plan_family_quota；price_tier；usage_event；credit_adjustment；billing_meta；billing_period_start_utc；billing_period_end_utc。
@@ -24,7 +24,7 @@
 优先级：Gate项
 所属层级：L3输入数据导入与完整性层
 
-检查项：用量资格与重试裁决
+3. 用量资格与重试裁决
 分值：18分
 标准答案或判定规则：每条usage_event先按账期、事件状态、计费标记和租户状态分类；基础条件合格后，同一request_key按ingested_at_utc升序裁决，时间相同时按event_id升序，只有首条进入eligible_usage。
 关键字段或路径：usage_event.event_id、request_key、event_status、billable_flag、event_time_utc、ingested_at_utc；tenant_account.billing_status；eligible_usage；exclusion_review。
@@ -36,7 +36,7 @@
 优先级：高权重项
 所属层级：L4数据清洗与质量控制层
 
-检查项：免费额度与阶梯计价
+4. 免费额度与阶梯计价
 分值：20分
 标准答案或判定规则：family_usage按tenant_id和api_family聚合有效用量；billable_units等于gross_units扣除free_units后的非负结果；charge_cents按price_tier的含端点区间累计。
 关键字段或路径：plan_family_quota.free_units；price_tier.tier_start_units、tier_end_units、unit_price_cents；family_usage的tenant_id、api_family、gross_units、free_units、billable_units和charge_cents。
@@ -48,7 +48,7 @@
 优先级：高权重项
 所属层级：L6领域计算与专业规则层
 
-检查项：账单调整与租户封顶
+5. 账单调整与租户封顶
 分值：18分
 标准答案或判定规则：adjustment_in_scope只纳入账期内已批准调整；tenant_invoice先汇总用量费和credit得到pre_cap_due_cents，再按monthly_cap_cents计算cap_reduction_cents与final_due_cents。
 关键字段或路径：credit_adjustment.adjustment_status、approved_at_utc和amount_cents；tenant_account.monthly_cap_cents；adjustment_in_scope；tenant_invoice全部金额字段。
@@ -60,7 +60,7 @@
 优先级：高权重项
 所属层级：L6领域计算与专业规则层
 
-检查项：排除复核的来源闭环
+6. 排除复核的来源闭环
 分值：8分
 标准答案或判定规则：未纳入计费的用量和账单调整写入exclusion_review，每行保留来源表、来源主键、租户、API族、排除原因、影响量和观察时间。
 关键字段或路径：usage_event；credit_adjustment；exclusion_review的source_id、source_table、tenant_id、api_family、exclusion_reason、affected_units和observed_at_utc。
@@ -72,7 +72,7 @@
 优先级：普通项
 所属层级：L9跨产物一致性与可追溯层
 
-检查项：报表合同与跨产物一致性
+7. 报表合同与跨产物一致性
 分值：12分
 标准答案或判定规则：各业务CSV的文件名、字段顺序和排序遵守report_contract.json；报表记录与修复库中对应派生表按合同业务主键逐字段一致。
 关键字段或路径：rules/report_contract.json；tenant_invoice；family_usage；exclusion_review；output/reports目录。
