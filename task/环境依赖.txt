@@ -1,4 +1,4 @@
-操作系统：Windows11、macOS或主流64位Linux。
+操作系统： Windows11、macOS或主流64位Linux。
 
 主软件为SQLite3.40或更高版本。任务入口使用Node.js22.5或更高版本的内置SQLite接口完成数据处理，无需第三方Node包或外部SQLite扩展。PowerShell、Windows终端或系统终端可用于解压和执行npm run process。
 
