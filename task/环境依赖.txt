@@ -1,3 +1,5 @@
-任务支持Windows11原生环境、macOS和Linux。主软件为SQLite3.40或更高版本，本题入口在Node.js24LTS中使用内置SQLite接口，实际执行窗口去重、分组聚合、阶梯区间计算、派生表重建和完整性检查。PowerShell、Windows终端或系统终端可用于解压和启动npm run process；实现不安装第三方Node包，也不加载外部SQLite扩展。
+操作系统：Windows11、macOS或主流64位Linux。
 
-正式处理只读取本地脱敏数据，不访问外部API、数据库或收款系统。执行账户需要读取input_data中的database与rules，并能在output创建数据库副本和报表。普通开发电脑的CPU与内存即可处理当前数据量，无需GPU；磁盘只需容纳Node.js、数据库副本和CSV。入口需设置有限超时，若数分钟内没有完成，应检查递归计价区间和事务状态。不需要业务账号或管理员权限。
+主软件为SQLite3.40或更高版本。任务入口使用Node.js22.5或更高版本的内置SQLite接口完成数据处理，无需第三方Node包或外部SQLite扩展。PowerShell、Windows终端或系统终端可用于解压和执行npm run process。
+
+适合当前账期数据规模的普通开发电脑CPU即可完成处理，无需GPU。磁盘需容纳Node.js、源库副本和三份CSV报表。执行账户需能读取database与rules，并能在output中创建数据库副本和报表。入口需设置有限超时，覆盖本题批次处理并避免异常无限等待。
