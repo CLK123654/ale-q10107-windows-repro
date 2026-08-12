@@ -1,0 +1,7 @@
+读取源库、计费合同和报表合同，确认账期边界、纳入状态、租户状态以及目标字段
+在源库副本载入运行期合同，保持tenant_account、plan_family_quota、price_tier、usage_event和credit_adjustment不变
+筛选有效用量，并按request_key、ingested_at_utc和event_id裁决重试请求
+按租户与API族扣减免费额度，依照价格区间累计用量费
+归集账期内已批准credit，在相加结果上应用monthly_cap_cents并记录封顶减免
+整理未纳入用量和账单调整，保留来源主键、原因、数量与观察时间
+执行完成版SQL并按report_contract.json导出财务账单、API族费用明细和排除复核表

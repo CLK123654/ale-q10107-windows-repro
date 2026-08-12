@@ -1,0 +1,5 @@
+支持Windows11、macOS和Linux。主软件为SQLite3.40或更高版本，Windows11可使用Node.js24自带的SQLite3.51兼容引擎。SQLite负责窗口去重、分组聚合、阶梯区间计算、派生表重建及完整性检查，不能用电子表格手填结果代替。
+
+辅助工具为Node.js24或更高版本、PowerShell、Windows终端或系统终端。运行入口只使用Node.js内置模块，不安装第三方依赖，不加载外部SQLite扩展。正式处理读取本地脱敏数据，不需要访问外部API、数据库或收款系统。SQLite和Node.js均可按各自开源许可使用。
+
+建议准备单核CPU、1GB内存和200MB可写磁盘。执行账户需要读取input_data/database、input_data/rules和input_data/output，并可在input_data/output创建数据库副本和报表。单次入口超时为60秒。业务风险集中在无效事件参与重试排名、先计价再扣免费额度、价格区间端点错位、纳入未批准credit以及在credit之前应用封顶。

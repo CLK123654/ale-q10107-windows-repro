@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "scanned_sources": 215,
+  "violations": [],
+  "answer_sheets": [
+    "交付物答案清单",
+    "固定字段答案",
+    "固定集合答案",
+    "固定数值答案",
+    "允许变体答案"
+  ],
+  "specification_sheets": [
+    "任务规格转化"
+  ],
+  "task_spec_row_count": 19,
+  "task_spec_column_count": 2,
+  "task_asset_id": "sqlite_api_monthly_billing",
+  "task_asset_id_valid": true,
+  "forbidden_spec_labels": [],
+  "declared_delivery_paths": [
+    "output/api_billing_repaired.db",
+    "output/rebuild_api_billing.sql",
+    "output/reports/exclusion_review.csv",
+    "output/reports/family_usage.csv",
+    "output/reports/tenant_invoice.csv"
+  ],
+  "reference_paths": [
+    "output/api_billing_repaired.db",
+    "output/rebuild_api_billing.sql",
+    "output/reports/exclusion_review.csv",
+    "output/reports/family_usage.csv",
+    "output/reports/tenant_invoice.csv"
+  ],
+  "business_inputs": [
+    "input_data/database/api_metering.db",
+    "input_data/rules/billing_contract.json",
+    "input_data/rules/report_contract.json"
+  ],
+  "business_inputs_present": true,
+  "humanizer_score": 47,
+  "online_ai_detector_used_as_conclusion": false
+}

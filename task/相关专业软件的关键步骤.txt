@@ -1,0 +1,8 @@
+1. 打开database/api_metering.db，检查五张源表的字段、主键、外键及样本分布。
+2. 读取billing_contract.json，将账期、纳入状态和排除租户状态写入临时合同表。
+3. 执行用量资格分类，在合格记录中按request_key建立窗口排名并保留首条。
+4. 按tenant_id和api_family聚合有效单位，扣除free_units后连接price_tier计算各区间费用。
+5. 筛选账期内approved调整，汇总租户费用与credit，再计算封顶减免和最终应收。
+6. 将无效用量、重复请求及未纳入调整归集到exclusion_review，保留原始定位字段。
+7. 写入billing_meta，运行PRAGMA integrity_check与PRAGMA foreign_key_check确认修复库可交付。
+8. 读取report_contract.json，从派生表按规定字段和顺序导出三张CSV并核对金额。
