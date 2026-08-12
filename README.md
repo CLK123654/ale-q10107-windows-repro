@@ -1,5 +1,5 @@
-# API月度计费的SQLite重试去重与阶梯出账
+# API月度计费
 
-artifacts目录保存本题四个最终附件，task目录保存候选人可见正文。verification目录中的脚本在GitHub托管Windows环境中从最终附件重建交付物，并记录SQLite版本、两次独立运行、输入变化、错误输入处理和Reference语义比较结果。
+本仓库保存API平台月度计费任务。artifacts目录包含输入数据、标准交付和两份工作簿，task目录包含业务说明，verification目录保存Windows检查程序。
 
-手动触发windows-2025工作流即可重新取得该提交对应的运行记录。
+工作流使用windows-2025和Node.js24内置SQLite。它会从输入包运行任务，核对修复数据库与三份业务报表，并在完成后上传运行证据。

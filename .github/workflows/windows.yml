@@ -27,6 +27,24 @@ jobs:
         shell: pwsh
         run: npm run verify
 
+      - name: Record Windows host audit
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path verification/evidence -Force | Out-Null
+          $audit = [ordered]@{
+            generated_at_utc = [DateTime]::UtcNow.ToString('o')
+            workflow_run_id = $env:GITHUB_RUN_ID
+            git_commit_sha = $env:GITHUB_SHA
+            runner_os = $env:RUNNER_OS
+            runner_arch = $env:RUNNER_ARCH
+            image_os = $env:ImageOS
+            image_version = $env:ImageVersion
+            powershell = $PSVersionTable.PSVersion.ToString()
+            node = (& node --version)
+          }
+          $audit | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath verification/evidence/windows-audit.json -Encoding utf8
+
       - name: Upload Windows evidence
         if: always()
         uses: actions/upload-artifact@v7

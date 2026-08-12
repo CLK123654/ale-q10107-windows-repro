@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "result": "PASS",
+  "method": "artifact-tool渲染后逐页目检",
+  "pages": [
+    {
+      "file": ".qa/workbook-previews/answer/01-交付物答案清单.png",
+      "result": "PASS"
+    },
+    {
+      "file": ".qa/workbook-previews/answer/02-固定字段答案.png",
+      "result": "PASS"
+    },
+    {
+      "file": ".qa/workbook-previews/answer/03-固定集合答案.png",
+      "result": "PASS"
+    },
+    {
+      "file": ".qa/workbook-previews/answer/04-固定数值答案.png",
+      "result": "PASS"
+    },
+    {
+      "file": ".qa/workbook-previews/answer/05-允许变体答案.png",
+      "result": "PASS"
+    },
+    {
+      "file": ".qa/workbook-previews/spec/01-任务规格转化.png",
+      "result": "PASS"
+    }
+  ],
+  "checks": {
+    "answer_sheet_count": 5,
+    "specification_sheet_count": 1,
+    "specification_column_count": 2,
+    "no_clipping": true,
+    "no_hidden_text": true,
+    "headers_readable": true,
+    "long_values_wrapped": true
+  }
+}

@@ -14,6 +14,15 @@ const evidenceRoot = path.join(repoRoot, 'verification', 'evidence');
 const npmCli = process.env.npm_execpath;
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const attachments = ['输入数据包.zip', 'reference.zip', '关键标准答案.xlsx', '任务规格转化.xlsx'];
+const expectedInput = [
+  'input_data/README.md',
+  'input_data/database/api_metering.db',
+  'input_data/package.json',
+  'input_data/rules/billing_contract.json',
+  'input_data/rules/report_contract.json',
+  'input_data/starter/rebuild_api_billing.sql',
+  'input_data/tools/run-task.mjs',
+].sort();
 const expectedReference = [
   'output/api_billing_repaired.db',
   'output/rebuild_api_billing.sql',
@@ -73,6 +82,13 @@ async function extractZip(file, destination) {
 function workbookSheets(file) {
   const workbook = parseZipBytes(fs.readFileSync(file)).get('xl/workbook.xml')?.toString('utf8') ?? '';
   return [...workbook.matchAll(/<(?:[A-Za-z]+:)?sheet[^>]+name="([^"]+)"/gu)].map((match) => match[1]);
+}
+function firstSheetShape(file) {
+  const archive = parseZipBytes(fs.readFileSync(file));
+  const xml = archive.get('xl/worksheets/sheet1.xml')?.toString('utf8') ?? '';
+  const rows = [...xml.matchAll(/<(?:[A-Za-z]+:)?row\b/gu)].length;
+  const cells = [...xml.matchAll(/<(?:[A-Za-z]+:)?c\b[^>]*\br="([A-Z]+)\d+"/gu)].map((match) => match[1]);
+  return { rows, columns: [...new Set(cells)].sort() };
 }
 async function run(command, args, cwd) {
   const started = Date.now();
@@ -186,20 +202,24 @@ function compareReference(outputRoot, reference) {
 }
 
 await fsp.rm(evidenceRoot, { recursive: true, force: true }); await fsp.mkdir(evidenceRoot, { recursive: true });
-assert(process.platform === 'win32' && process.env.GITHUB_ACTIONS === 'true', '该验证器只接受GitHub托管Windows运行');
+assert(process.platform === 'win32' && process.env.GITHUB_ACTIONS === 'true' && process.env.RUNNER_OS === 'Windows', '该验证器只接受GitHub托管Windows运行');
+assert(/^win25/iu.test(process.env.ImageOS ?? ''), `需要windows-2025镜像，当前为${process.env.ImageOS ?? 'unknown'}`);
 const attachmentSha256 = Object.fromEntries(attachments.map((name) => [name, sha256File(path.join(artifactRoot, name))]));
 const inputMembers = parseZip(path.join(artifactRoot, '输入数据包.zip'));
+assert(JSON.stringify([...inputMembers.keys()].sort()) === JSON.stringify(expectedInput), '输入数据包成员错误');
 const executableScan = [...inputMembers].map(([name, bytes]) => ({ name, classification: classifyExecutable(name, bytes) })).filter((item) => item.classification);
 assert(executableScan.length === 0, `输入包含平台专用可执行成员：${JSON.stringify(executableScan)}`);
 const referenceMembers = [...parseZip(path.join(artifactRoot, 'reference.zip')).keys()].sort();
 assert(JSON.stringify(referenceMembers) === JSON.stringify(expectedReference), 'Reference成员错误');
 assert(JSON.stringify(workbookSheets(path.join(artifactRoot, '关键标准答案.xlsx'))) === JSON.stringify(['交付物答案清单', '固定字段答案', '固定集合答案', '固定数值答案', '允许变体答案']), '关键标准答案Sheet错误');
 assert(JSON.stringify(workbookSheets(path.join(artifactRoot, '任务规格转化.xlsx'))) === JSON.stringify(['任务规格转化']), '任务规格Sheet错误');
+const specificationShape = firstSheetShape(path.join(artifactRoot, '任务规格转化.xlsx'));
+assert(specificationShape.rows === 17 && JSON.stringify(specificationShape.columns) === JSON.stringify(['A', 'B']), '任务规格必须恰为两列且包含17行');
 const solutionText = parseZip(path.join(artifactRoot, 'reference.zip')).get('output/rebuild_api_billing.sql').toString('utf8');
 assert(!/\b(?:U00[1-9]|U01[0-2]|T100|T200|T300|T400|A00[1-4])\b|https?:\/\//u.test(solutionText), '完成版SQL含样本主键硬编码或外部地址');
 
 const cleanRuns = [];
-for (const label of ['Q10107 第一次 空目录', 'Q10107 第二次 中文 空格目录']) {
+for (const label of ['API计费 首次目录', 'API计费 第二次 中文 空格目录']) {
   const prepared = await prepare(label); const before = treeDigest(prepared.inputRoot, new Set(['output']));
   const result = await runNpm(['run', 'process'], prepared.inputRoot);
   assert(result.code === 0, `${label}执行失败\n${result.stdout}\n${result.stderr}`);
@@ -210,14 +230,14 @@ for (const label of ['Q10107 第一次 空目录', 'Q10107 第二次 中文 空�
 }
 assert(cleanRuns[0].semantic_digest === cleanRuns[1].semantic_digest, '两次结构化结果不一致');
 
-const crlf = await prepare('Q10107 CRLF 规则', async (inputRoot) => {
+const crlf = await prepare('API计费 CRLF规则', async (inputRoot) => {
   const file = path.join(inputRoot, 'rules', 'report_contract.json'); const text = await fsp.readFile(file, 'utf8');
   await fsp.writeFile(file, text.replace(/\r?\n/gu, '\r\n'));
 });
 let result = await runNpm(['run', 'process'], crlf.inputRoot); assert(result.code === 0, `CRLF规则执行失败\n${result.stdout}\n${result.stderr}`);
 const crlfDigest = compareReference(crlf.outputRoot, crlf.reference); assert(crlfDigest === cleanRuns[0].semantic_digest, 'CRLF规则改变业务结果');
 
-const mutation = await prepare('Q10107 有效封顶变化', async (inputRoot) => {
+const mutation = await prepare('API计费 有效封顶变化', async (inputRoot) => {
   const file = path.join(inputRoot, 'database', 'api_metering.db'); const db = new DatabaseSync(file);
   try { db.prepare('UPDATE tenant_account SET monthly_cap_cents = ? WHERE tenant_id = ?').run(4000, 'T200'); } finally { db.close(); }
 });
@@ -227,8 +247,11 @@ const t200 = mutatedInvoices.find((row) => row.tenant_id === 'T200');
 assert(t200?.monthly_cap_cents === '4000' && t200.cap_reduction_cents === '1450' && t200.final_due_cents === '4000', '封顶变化未联动T200账单');
 const referenceInvoices = normalizedRows('output/reports/tenant_invoice.csv', mutation.reference.get('output/reports/tenant_invoice.csv').toString('utf8'));
 assert(JSON.stringify(mutatedInvoices.filter((row) => row.tenant_id !== 'T200')) === JSON.stringify(referenceInvoices.filter((row) => row.tenant_id !== 'T200')), '封顶变化影响无关租户');
+const mutationDigest = crypto.createHash('sha256').update(JSON.stringify(mutatedInvoices)).digest('hex');
+const baselineInvoiceDigest = crypto.createHash('sha256').update(JSON.stringify(referenceInvoices)).digest('hex');
+assert(mutationDigest !== baselineInvoiceDigest, '有效输入变化没有改变账单语义');
 
-const negative = await prepare('Q10107 无效报表合同', async (inputRoot) => { await fsp.rm(path.join(inputRoot, 'rules', 'report_contract.json')); });
+const negative = await prepare('API计费 无效报表合同', async (inputRoot) => { await fsp.rm(path.join(inputRoot, 'rules', 'report_contract.json')); });
 result = await runNpm(['run', 'process'], negative.inputRoot);
 const dynamicAbsent = !fs.existsSync(path.join(negative.outputRoot, 'api_billing_repaired.db')) && !fs.existsSync(path.join(negative.outputRoot, 'reports'));
 assert(result.code !== 0 && dynamicAbsent, '无效输入没有失败关闭');
@@ -238,11 +261,12 @@ const evidence = {
   git_commit_sha: process.env.GITHUB_SHA, workflow_run_id: process.env.GITHUB_RUN_ID,
   runner: { os: process.env.RUNNER_OS, arch: process.env.RUNNER_ARCH, image_os: process.env.ImageOS, image_version: process.env.ImageVersion, node: process.version, powershell_hosted_workflow: true },
   software: { main: 'SQLite', executed: true, sqlite_version: cleanRuns[0].sqlite_version, node: process.version }, attachment_sha256: attachmentSha256,
-  workbook_checks: { answer_sheet_names: workbookSheets(path.join(artifactRoot, '关键标准答案.xlsx')), specification_sheet_names: ['任务规格转化'] },
+  archive_checks: { input_members: [...inputMembers.keys()].sort(), reference_members: referenceMembers },
+  workbook_checks: { answer_sheet_names: workbookSheets(path.join(artifactRoot, '关键标准答案.xlsx')), specification_sheet_names: ['任务规格转化'], specification_shape: specificationShape },
   platform_audit: { linux_executables: executableScan, linux_executables_executed: false, no_wsl_required: true, no_linux_container_required: true, no_posix_shell_required: true, no_unix_only_api_required: true, cross_platform_paths: true },
   clean_runs: cleanRuns,
   crlf_input: { file: 'rules/report_contract.json', exit_code: 0, semantic_digest: crlfDigest, reference_match: true },
-  positive_mutation: { changed_input: 'tenant_account.T200.monthly_cap_cents从3000改为4000', exit_code: 0, t200_invoice: t200, unrelated_tenants_unchanged: true },
+  positive_mutation: { changed_input: 'tenant_account.T200.monthly_cap_cents从3000改为4000', exit_code: 0, baseline_invoice_digest: baselineInvoiceDigest, mutated_invoice_digest: mutationDigest, t200_invoice: t200, unrelated_tenants_unchanged: true },
   invalid_input: { removed_input: 'rules/report_contract.json', exit_code: result.code, dynamic_deliverables_absent: dynamicAbsent },
   network: { installation_network_access: 'Node.js安装阶段', formal_run_network_access: 'none, local files and local SQLite only' },
 };

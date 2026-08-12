@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "skill": "humanizer-zh",
+  "result": "PASS",
+  "reviewed_scopes": [
+    "任务名称",
+    "任务概要",
+    "任务prompt",
+    "关键动作",
+    "评分表",
+    "环境依赖",
+    "软件步骤",
+    "输入材料中的自然语言",
+    "标准交付中的用户可见文字",
+    "关键标准答案工作簿全部自然语言",
+    "任务规格工作簿全部自然语言"
+  ],
+  "score": {
+    "directness": 10,
+    "rhythm": 9,
+    "trust": 10,
+    "authenticity": 9,
+    "concision": 9,
+    "total": 47,
+    "maximum": 50
+  },
+  "minimum_total": 45,
+  "notes": [
+    "题面以财务开票、计费追溯和争议处理为实际消费场景，直接说明账期与出账问题。",
+    "重试裁决、免费额度、价格阶梯、credit与租户封顶均来自可见合同和SQLite源表。",
+    "候选人可见内容只保留业务任务，不包含运行验收、样本变更或错误输入编排。",
+    "评分表只说明输入规则、业务主键、字段、容差和复算关系，精确样本答案保存在五页标答。",
+    "线上AI感检测只作为历史线索，没有参与当前语言结论。"
+  ],
+  "online_ai_detection_used_as_conclusion": false,
+  "reviewed_artifacts_sha256": {
+    "任务名称.txt": "f69d2c61b65bf696a1e140baab10d0f139e0889d20bdbe90729efc4550806e88",
+    "任务概要.txt": "590f0752abe9712baac5f40c00c4d64a1aba5b2d4d59d6e95a2525e776dd3235",
+    "任务prompt.txt": "1fe9aa51d0119a62f9dc8bc0babd6eb271a5934eb6e03fbad387ea5b62179527",
+    "关键动作.txt": "bc74321c95af74248bc1cc0c95835ad91a4927de114668ed55c88eabb06def49",
+    "评分表.txt": "c27c2b399f22fea4125de5b2767fb1484976362fd2dccbbefa01637071430680",
+    "环境依赖.txt": "3a460fcdb77f34326e5b700b5cc0d7e4b22ab148b4d2222be9be439ae3b30b89",
+    "相关专业软件的关键步骤.txt": "631d5b727684d02d3dbc0a83bfdef7f7a0606c3ba18d3dd68b3f743c2bc82b2c",
+    "task_fields.json": "8502d5a78b5a7c1b4f729eaad7b2773ff420fc3c8aa246d959aae0100bb40db9",
+    "输入数据包.zip": "bbca108e579a548d012a35fdd71c3811c25870b62e53d43b0803fb4fb27bd2a9",
+    "reference.zip": "6fd1535ab0b5f62726924880868195b8065397788af772245c8e28d3f4fa3b0e",
+    "关键标准答案.xlsx": "517c7d8bfe9f65c1a0cfb64ab8b0531ab379ae180749a22d4183ee2c4932cca9",
+    "任务规格转化.xlsx": "ea7832b532db578ac7c4d4f49a8e000c2975d4380a1e650c3472e3b3a745a33f"
+  }
+}
