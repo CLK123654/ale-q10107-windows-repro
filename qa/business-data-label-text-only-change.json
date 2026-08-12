@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "task_key": "id:10107",
+  "result": "PASS",
+  "change_type": "business_data_label_text_only",
+  "windows_rerun_required": false,
+  "business_semantics_changed": false,
+  "unchanged": ["data", "rules", "code", "attachment_member_structure", "answers", "score_semantics"],
+  "files": [
+    {
+      "path": "输入数据包.zip::input_data/README.md",
+      "old_sha256": "9ce968d912405180ab8f43ca240a6cec79000a8dae71f909fed950973652b206",
+      "new_sha256": "b1ae51fba420e6312c5bb1dbc893badf242f5c4a8818aac589ff15760b4c5b96",
+      "literal_replacement": {
+        "old": "database/api_metering.db保存租户、免费额度、价格阶梯、用量事件和账单调整，内容均为脱敏演练数据。",
+        "new": "database/api_metering.db保存租户、免费额度、价格阶梯、用量事件和账单调整，租户及账务字段已经脱敏。"
+      }
+    },
+    {
+      "path": "NOTICE.md",
+      "old_sha256": "511ac69a1f6ab08fbca86dfaf242c2cb8c7e0b88bab93a3f6d49d892bd3854ed",
+      "new_sha256": "3f827ba4f351c566c56383cc0e2ac556817b4292bda1a80aeebf999404f822e8",
+      "literal_replacement": {
+        "old": "仓库中的数据库、合同和报表均为虚构的脱敏演练材料，不包含真实租户、账号或交易数据。",
+        "new": "本仓库保存本次API账单核算使用的数据库、合同和报表，租户、账号及交易字段已经脱敏。"
+      }
+    }
+  ],
+  "attachment_sha256": {
+    "old_input_zip": "bbca108e579a548d012a35fdd71c3811c25870b62e53d43b0803fb4fb27bd2a9",
+    "new_input_zip": "a4c8ffa13b2c7b1e5e126cadc9793aa9a9483adb63c2289911a02d590b534a0f",
+    "reference_zip": "6fd1535ab0b5f62726924880868195b8065397788af772245c8e28d3f4fa3b0e",
+    "answer_xlsx": "517c7d8bfe9f65c1a0cfb64ab8b0531ab379ae180749a22d4183ee2c4932cca9",
+    "spec_xlsx": "ea7832b532db578ac7c4d4f49a8e000c2975d4380a1e650c3472e3b3a745a33f"
+  },
+  "archive_comparison": {
+    "member_count_before": 7,
+    "member_count_after": 7,
+    "changed_members": ["input_data/README.md"],
+    "all_other_member_bytes_equal": true
+  },
+  "retained_windows_evidence": {
+    "run_id": 31591181568,
+    "windows_verification_sha256": "8ff2b43f4a3efc568a177ffc23dff17efd4fbe7bcc300efb8ff962651902d615"
+  },
+  "humanizer_review": "PASS",
+  "reason": "README只改正数据标签，归档成员、业务数据、规则和程序均未变化。"
+}
